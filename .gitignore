@@ -1,0 +1,67 @@
+# v0 sandbox internal files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+.vercel/
+
+# Environment variables
+.env*.local
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+*.sqlite3
+frontend/dist/
+.foundation_edit.py
+*.egg-info/
+*.tsbuildinfo
+.pnpm-store/
+
+# Local databases, backups and credentials
+*.sqlite3-*
+*.db
+*.db-*
+*.sql
+*.dump
+*.bak
+*.pem
+*.key
+.envrc
+
+# Generated Python, test and build output
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+dist/
+build/
+staticfiles/
+media/
+*.log
+
+# Machine-specific editor and agent state
+.idea/
+.vscode/
+.codex/
+.agents/
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# Generated presentation and review artifacts
+/plutus-ai-*.png
+/docs/*.patch

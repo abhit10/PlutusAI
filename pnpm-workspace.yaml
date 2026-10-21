@@ -1,0 +1,7 @@
+packages:
+  - frontend
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - '@next/*'
+  - next

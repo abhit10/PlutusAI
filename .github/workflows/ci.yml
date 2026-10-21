@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: plutus
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: plutusai
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U plutus -d plutusai"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://plutus:ci-only-password@localhost:5432/plutusai
+      DATABASE_SSL_REQUIRED: 'false'
+      DJANGO_SECRET_KEY: disposable-ci-only-secret-not-for-deployment
+      DJANGO_DEBUG: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python manage.py check
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py test apps.core --noinput
+      - run: python scripts/verify_market_migration.py
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --global pnpm@11.25.0
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir frontend test
+      - run: pnpm build
