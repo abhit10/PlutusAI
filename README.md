@@ -5,7 +5,7 @@ Vite 6, Tailwind CSS 4, Django 5.2 and Django REST Framework.
 
 The base project includes session authentication, separate stock and crypto portfolios,
 holdings management, audit history, and light/dark themes. Live market data, predictions,
-risk analysis and the chatbot are future work; no prices or predictions are fabricated.
+risk analysis and the chatbot are future work. The animated landing page uses labelled illustrative market examples, not live prices or predictions.
 
 ## Requirements
 

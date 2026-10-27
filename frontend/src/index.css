@@ -220,3 +220,10 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline-color: var
 .landing-footer { padding-block:24px; color:var(--color-muted); border-top:1px solid var(--color-border); font-size:12px; line-height:1.8; }
 .landing-skip { position:absolute; left:16px; top:-100px; padding:12px; background:var(--color-surface); z-index:10; }.landing-skip:focus { top:12px; }
 @media(max-width:760px) { .landing-wrap { padding-inline:24px; }.landing-header { padding:16px 20px; }.landing-header .brand { font-size:20px; }.landing-header .landing-actions { gap:14px; }.landing-header .portfolio-button { padding:10px 14px; font-size:12px; }.landing-hero { grid-template-columns:1fr; gap:36px; padding-block:48px; }.landing-hero h1 { letter-spacing:-1.7px; }.landing-lead { font-size:17px; }.landing-section { padding-block:38px; }.landing-steps,.landing-pillars,.landing-boundaries { grid-template-columns:1fr; gap:24px; }.landing-pillar { padding:24px; }.landing-closing { padding-block:44px; } }
+
+/* The icon depicts the active theme; its accessible label describes the action. */
+.theme-icon .theme-sun, .theme-icon .theme-moon { transform-origin: 12px 12px; transition: opacity .2s, transform .25s; }
+.theme-icon .theme-moon { opacity: 0; transform: rotate(-35deg) scale(.7); }
+.theme-icon.is-dark .theme-sun { opacity: 0; transform: rotate(45deg) scale(.7); }
+.theme-icon.is-dark .theme-moon { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .theme-icon * { transition: none; } }

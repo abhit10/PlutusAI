@@ -65,3 +65,9 @@ Desktop.ini
 # Generated presentation and review artifacts
 /plutus-ai-*.png
 /docs/*.patch
+
+# Local reference captures and logs
+/tmp/
+
+# Local copy of the updated project; publish the root application only
+/plutus-ai/

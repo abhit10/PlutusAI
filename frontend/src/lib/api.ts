@@ -52,6 +52,9 @@ async function request<T>(method: string, path: string, body?: Json): Promise<T>
   const text = await res.text()
   let data
   try { data = text ? JSON.parse(text) : undefined } catch {
+    if (res.status === 403) {
+      throw new ApiError(403, "The server rejected this request's security check. Refresh the page and try again.", null)
+    }
     throw new ApiError(res.status, "The server is unavailable or returned an unexpected response. Please retry.", null)
   }
 

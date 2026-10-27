@@ -106,6 +106,23 @@ class FoundationTests(TestCase):
         self.assertEqual(post('/api/auth/login/', payload).status_code, 200)
         self.assertEqual(client.get('/api/assets/').status_code, 200)
 
+    def test_login_csrf_with_preserved_proxy_host(self):
+        # A dev proxy must preserve Host so the browser Origin matches even
+        # when Vite uses a non-default port. Foreign origins remain forbidden.
+        client = APIClient(enforce_csrf_checks=True)
+        host = '127.0.0.1:3002'
+        client.get('/api/auth/csrf/', HTTP_HOST=host)
+        payload = {'email': 'owner@example.test', 'password': 'Good-password-81'}
+        headers = {'HTTP_HOST': host, 'HTTP_X_CSRFTOKEN': client.cookies['csrftoken'].value}
+        self.assertEqual(client.post('/api/auth/login/', payload, format='json',
+            HTTP_ORIGIN='https://untrusted.example', **headers).status_code, 403)
+        self.assertEqual(client.post('/api/auth/login/', payload, format='json',
+            HTTP_ORIGIN=f'http://{host}', **headers).status_code, 200)
+        self.assertEqual(client.get('/api/auth/me/', HTTP_HOST=host).status_code, 200)
+        self.assertEqual(client.post('/api/auth/logout/', {}, format='json',
+            HTTP_HOST=host, HTTP_ORIGIN=f'http://{host}',
+            HTTP_X_CSRFTOKEN=client.cookies['csrftoken'].value).status_code, 204)
+
     def test_edit_preserves_omitted_cost_and_invalid_is_atomic(self):
         p = self.create(holdings=[{'symbol': 'STOCK', 'quantity': '2', 'avg_cost_inr': '12.345'}]).data
         url = f"/api/portfolios/{p['id']}/holdings/"

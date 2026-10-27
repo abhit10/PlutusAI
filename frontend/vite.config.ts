@@ -16,9 +16,11 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: ["localhost", "127.0.0.1"],
     proxy: {
-      "/api": { target: DJANGO, changeOrigin: true },
-      "/admin": { target: DJANGO, changeOrigin: true },
-      "/static": { target: DJANGO, changeOrigin: true },
+      // Preserve the browser's Host (including the chosen dev port) so Django
+      // can compare Origin to Host for CSRF. Do not rewrite Origin or disable CSRF.
+      "/api": { target: DJANGO, changeOrigin: false },
+      "/admin": { target: DJANGO, changeOrigin: false },
+      "/static": { target: DJANGO, changeOrigin: false },
     },
   },
 })
