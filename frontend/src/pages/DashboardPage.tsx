@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { marketPath, marketLabel } from "../lib/market";
 import { portfolioApi } from "../lib/portfolio";
@@ -22,6 +22,7 @@ import HoldingsToolbar, {
 } from "../components/HoldingsToolbar";
 import CreatePortfolio from "../components/CreatePortfolio";
 import ChangeHistory from "../components/ChangeHistory";
+const MarketOverview = lazy(() => import("../components/MarketOverview"));
 export default function DashboardPage({ market }: { market: AssetClass }) {
   const navigate = useNavigate(),
     { user } = useAuth();
@@ -128,6 +129,7 @@ export default function DashboardPage({ market }: { market: AssetClass }) {
           </Button>
         </div>
       )}
+      <Suspense fallback={<Skeleton />}><MarketOverview key={market} market={market} /></Suspense>
       {deleting && (
         <DeletePortfolio
           portfolio={deleting}
@@ -384,8 +386,8 @@ function Overview({
               </div>
             )}
             <p className="valuation-note">
-              Live prices and performance analysis are coming soon. Purchase
-              costs are the amounts you enter.
+              Purchase costs are the amounts you enter. Market quotes above do
+              not change your holdings or calculate portfolio returns.
             </p>
           </Card>
           <Card>

@@ -152,6 +152,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "auth": "30/min",
+        "market": "120/min",
     },
     "UNAUTHENTICATED_USER": None,
 }

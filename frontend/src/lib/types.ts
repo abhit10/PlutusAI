@@ -6,6 +6,56 @@ export interface User {
 
 export type AssetClass = "stock" | "crypto"
 
+export type MarketRange = "1D" | "1W" | "1M" | "1Y" | "ALL"
+export type MarketCurrency = "INR" | "USDT"
+export interface MarketProvenance {
+  symbol: string
+  market: AssetClass
+  source: "yahoo" | "binance"
+  provider_symbol: string
+  currency: MarketCurrency
+  fetched_at: string
+  cached: boolean
+  stale: boolean
+  warning?: string
+}
+export interface MarketQuote extends MarketProvenance {
+  name: string
+  current_price: number
+  change: number | null
+  change_percent: number | null
+  day_high: number
+  day_low: number
+  open: number
+  previous_close: number | null
+  volume: number
+  timestamp: string
+  delay: string
+  change_basis: string
+  conversion: { pair: string; rate: number; source: string; timestamp: string } | null
+}
+export interface MarketCandle {
+  time: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+  complete: boolean
+}
+export interface MarketHistory extends MarketProvenance {
+  range: MarketRange
+  candles: MarketCandle[]
+  interval: string
+  timezone: "UTC"
+  schema_version: number
+  price_basis: "yahoo_auto_adjust_false" | "exchange_native"
+  volume_unit: string
+  dropped_candles: number
+  truncated: boolean
+  period_description: string
+}
+
 export interface Asset {
   id: number
   symbol: string

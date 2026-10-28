@@ -25,6 +25,7 @@ frontend/dist/
 *.egg-info/
 *.tsbuildinfo
 .pnpm-store/
+.uv-cache/
 
 # Local databases, backups and credentials
 *.sqlite3-*
@@ -68,6 +69,3 @@ Desktop.ini
 
 # Local reference captures and logs
 /tmp/
-
-# Local copy of the updated project; publish the root application only
-/plutus-ai/

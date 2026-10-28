@@ -29,7 +29,7 @@ async function ensureCsrf(): Promise<void> {
 
 type Json = Record<string, unknown> | undefined
 
-async function request<T>(method: string, path: string, body?: Json): Promise<T> {
+async function request<T>(method: string, path: string, body?: Json, signal?: AbortSignal): Promise<T> {
   const unsafe = method !== "GET" && method !== "HEAD"
   if (unsafe) await ensureCsrf()
 
@@ -42,6 +42,7 @@ async function request<T>(method: string, path: string, body?: Json): Promise<T>
 
   const res = await fetch(`/api${path}`, {
     method,
+    signal,
     credentials: "include",
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -85,7 +86,7 @@ function firstError(data: Record<string, unknown>): string | null {
 }
 
 export const api = {
-  get: <T,>(path: string) => request<T>("GET", path),
+  get: <T,>(path: string, signal?: AbortSignal) => request<T>("GET", path, undefined, signal),
   post: <T,>(path: string, body?: Json) => request<T>("POST", path, body),
   patch: <T,>(path: string, body?: Json) => request<T>("PATCH", path, body),
   del: <T,>(path: string, body?: Json) => request<T>("DELETE", path, body),
