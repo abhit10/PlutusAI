@@ -227,3 +227,13 @@ button:focus-visible, a:focus-visible, select:focus-visible { outline-color: var
 .theme-icon.is-dark .theme-sun { opacity: 0; transform: rotate(45deg) scale(.7); }
 .theme-icon.is-dark .theme-moon { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .theme-icon * { transition: none; } }
+
+/* Portfolio quotes use a separate strip so editing controls remain stable. */
+.live-valuation { padding:18px; margin:16px 0; border:1px solid var(--color-border); border-radius:16px; background:var(--color-surface); }
+.live-price-grid { display:flex; flex-wrap:wrap; gap:16px 28px; align-items:center; }
+.live-price-grid > div { display:flex; flex:1 1 140px; flex-direction:column; gap:6px; min-width:0; }
+.live-price-grid small { color:var(--color-muted); font-size:12px; }
+.live-price-grid strong { font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.live-valuation p { font-size:12px; line-height:1.6; margin:12px 0 0; }
+.holding-live-prices { padding:0 0 18px; }
+.holding-live-prices > small { display:block; margin-top:10px; font-size:11px; }

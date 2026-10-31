@@ -5,11 +5,12 @@ const isVisible = () => document.visibilityState !== "hidden"
 
 // One request at a time per resource. Abort on asset/range changes, pause in
 // background tabs, and retain (visibly stale) data only for the same resource.
-export function useMarketData<T>(path: string, interval: number) {
-  const [state, setState] = useState<{ path: string; data?: T; error?: string; loading: boolean }>({ path, loading: true })
+export function useMarketData<T>(path: string | null, interval: number) {
+  const [state, setState] = useState<{ path: string | null; data?: T; error?: string; loading: boolean }>({ path, loading: true })
   const [attempt, setAttempt] = useState(0)
   const retry = useCallback(() => setAttempt(n => n + 1), [])
   useEffect(() => {
+    if (!path) return
     let active = true
     let timer: ReturnType<typeof setTimeout> | undefined
     let controller: AbortController | undefined
@@ -22,7 +23,7 @@ export function useMarketData<T>(path: string, interval: number) {
       controller = new AbortController()
       setState(previous => ({ ...(previous.path === path ? previous : { path }), loading: true }))
       try {
-        const data = await api.get<T>(path, controller.signal)
+        const data = await api.get<T>(path!, controller.signal)
         if (active) setState({ path, data, loading: false })
       } catch (error) {
         failed = true

@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .market_views import MarketView, MarketHistoryView
+from .market_views import MarketView, MarketHistoryView, PortfolioValuationView
 
 from .views import (
     AssetViewSet,
@@ -17,6 +17,7 @@ router.register("assets", AssetViewSet, basename="asset")
 router.register("portfolios", PortfolioViewSet, basename="portfolio")
 
 urlpatterns = [
+    path("market/portfolio/<int:pk>/", PortfolioValuationView.as_view(), name="portfolio-valuation"),
     path("market/quote/", MarketView.as_view(), name="market-quote"),
     path("market/history/", MarketHistoryView.as_view(), name="market-history"),
     path("auth/csrf/", CsrfView.as_view(), name="csrf"),

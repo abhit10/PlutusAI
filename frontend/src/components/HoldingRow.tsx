@@ -4,6 +4,7 @@ import type { Ledger } from "../lib/useLedger";
 import { portfolioApi } from "../lib/portfolio";
 import { formatInr, formatQty } from "../lib/format";
 import QuantityControl from "./QuantityControl";
+import { HoldingPrices, type PricedHolding } from './PortfolioPrices';
 import { AssetIdentity, Banner, Button, Field, Form, Input } from "./ui";
 export default function HoldingRow({
   holding: h,
@@ -12,12 +13,16 @@ export default function HoldingRow({
   focusToken,
   onRemoved,
   missing = false,
+  price,
+  pricesStale,
 }: {
   holding: Holding;
   ledger: Ledger;
   focus: boolean;
   focusToken?: string;
   missing?: boolean;
+  price?: PricedHolding;
+  pricesStale?: boolean;
   onRemoved: (h: Holding) => void;
 }) {
   const [editing, setEditing] = useState(focus);
@@ -98,6 +103,7 @@ export default function HoldingRow({
           )}
         </div>
       </div>
+      {!missing && <HoldingPrices row={price} stale={pricesStale} />}
       {missing && (
         <Banner tone="info">
           This holding was removed in another session. Its draft is kept here;

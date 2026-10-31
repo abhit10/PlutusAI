@@ -21,6 +21,7 @@ import { useAuth } from "../lib/auth";
 import AddHoldingForm from "../components/AddHoldingForm";
 import HoldingRow from "../components/HoldingRow";
 import ChangeHistory from "../components/ChangeHistory";
+import { usePortfolioPrices, PortfolioPriceSummary } from '../components/PortfolioPrices';
 export default function PortfolioPage({ market }: { market: AssetClass }) {
   const { id } = useParams();
   const [p, setP] = useState<Portfolio | null>(null);
@@ -54,6 +55,7 @@ export default function PortfolioPage({ market }: { market: AssetClass }) {
 function Editor({ initial }: { initial: Portfolio }) {
   const ledger = useLedger(initial),
     p = ledger.portfolio;
+  const prices = usePortfolioPrices(p);
   const [params, setParams] = useSearchParams();
   const location = useLocation(),
     navigate = useNavigate(),
@@ -127,6 +129,7 @@ function Editor({ initial }: { initial: Portfolio }) {
         />
       )}
       <Feedback ledger={ledger} />
+      {p.holdings.length > 0 && <PortfolioPriceSummary prices={prices} />}
       {removed.map((h) => (
         <div className="portfolio-toast" role="status" key={h.symbol}>
           <span>{h.symbol} removed</span>
@@ -195,6 +198,8 @@ function Editor({ initial }: { initial: Portfolio }) {
                   <HoldingRow
                     key={h.symbol}
                     holding={h}
+                    price={prices.data?.holdings.find(row => row.symbol === h.symbol)}
+                    pricesStale={!!prices.error}
                     missing={
                       !p.holdings.some((saved) => saved.symbol === h.symbol)
                     }
@@ -219,8 +224,7 @@ function Editor({ initial }: { initial: Portfolio }) {
               </p>
             )}
             <p className="valuation-note">
-              Live prices and performance analysis are coming soon. Purchase
-              costs are the amounts you enter.
+              Market values refresh automatically. Your saved quantities and purchase costs stay unchanged.
             </p>
           </Card>
           <section id="add-holding" className="dash-card">

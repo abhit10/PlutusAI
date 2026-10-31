@@ -103,6 +103,18 @@ ranges. Quotes poll every 20 seconds and history every five minutes while the ta
 visible. Selecting another asset or timeframe cancels outdated client requests.
 Market data never changes the portfolio ledger or its Decimal purchase costs.
 
+The add-holding form defaults to the latest available INR quote, saving that price
+as the purchase cost when the holding is added. Select historical purchase cost to
+enter your own cost or leave it unknown. This records a holding; it does not place a trade.
+Stale/unavailable quotes cannot be used as a new purchase cost.
+
+Portfolio overview and detail screens refresh holding prices, market values and
+unrealized gains/losses every 20 seconds while visible. The authenticated
+`/api/market/portfolio/<id>/` endpoint values only the requesting user's holdings,
+uses Decimal arithmetic, and never modifies ledger records. Missing quotes suppress
+the total rather than treating a holding as zero; unknown costs suppress total
+gain/loss. Stale values are labelled. Totals exclude cash, fees and realized returns.
+
 Authenticated read-only endpoints (active seeded assets only):
 
 - `/api/market/quote/?symbol=RELIANCE&market=stock`

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import type { Asset, AssetClass, Holding } from "../lib/types";
+import type { Asset, AssetClass, Holding, MarketQuote } from "../lib/types";
+import { useMarketData } from "../lib/useMarketData";
+import { formatInr, formatDateTime } from "../lib/format";
 import { Button, Field, Form, Input } from "./ui";
 import QuantityControl from "./QuantityControl";
 import AssetPicker from "./AssetPicker";
@@ -29,6 +31,10 @@ export default function AddHoldingForm({
   const [asset, setAsset] = useState<Asset | null>(null);
   const [quantity, setQuantity] = useState("");
   const [cost, setCost] = useState("");
+  const [useQuote, setUseQuote] = useState(true);
+  const quote = useMarketData<MarketQuote>(asset ? `/market/quote/?symbol=${encodeURIComponent(asset.symbol)}&market=${market}` : null, 20_000);
+  const current = quote.data;
+  const quoteReady = !!current && !quote.error && !current.stale && current.currency === 'INR' && Number.isFinite(current.current_price) && current.current_price > 0;
   const [localError, setLocalError] = useState("");
   const existing = holdings.find((h) => h.symbol === asset?.symbol);
   return (
@@ -48,27 +54,45 @@ export default function AddHoldingForm({
           );
           return;
         }
+        if (useQuote && !quoteReady) {
+          setLocalError('Wait for a price, retry, or enter a purchase cost manually.');
+          return;
+        }
         if (
           await onSubmit({
             symbol: asset.symbol,
             quantity,
-            avg_cost_inr: cost.trim() || null,
+            avg_cost_inr: useQuote ? current!.current_price.toFixed(2) : cost.trim() || null,
           })
         ) {
           setAsset(null);
           setQuantity("");
           setCost("");
+          setUseQuote(true);
         }
       }}
     >
       <AssetPicker
         market={market}
         value={asset}
-        onChange={setAsset}
+        onChange={(next) => { setAsset(next); setCost(''); setLocalError(''); }}
         disabled={busy}
         holdings={holdings}
         onEdit={onEdit}
       />
+      {asset && <div className="live-valuation">
+        <strong>{asset.symbol} · {current ? formatInr(current.current_price.toFixed(2)) : quote.error ? 'Price unavailable' : 'Loading market price…'}</strong>
+        {current && <p className="muted">{current.source === 'binance' ? 'Binance · Indicative INR' : 'Yahoo Finance'} · As of {formatDateTime(current.timestamp)} IST. {current.stale ? 'Stale quote.' : 'Updates every 20 seconds; prices may be delayed.'}</p>}
+        {quote.error && <p role="status">{quote.error}</p>}
+        <Button variant="outline" disabled={quote.loading} onClick={quote.retry}>Refresh quote</Button>
+      </div>}
+      <Field label="Purchase cost source">
+        <select className="portfolio-input" value={useQuote ? 'quote' : 'manual'} disabled={busy} onChange={e => setUseQuote(e.target.value === 'quote')}>
+          <option value="quote">Use latest available price</option>
+          <option value="manual">Enter historical purchase cost</option>
+        </select>
+        <small>The selected price is saved as your purchase cost when added. Later quotes update market value only; this does not execute a trade.</small>
+      </Field>
       {existing && (
         <div className="inline-notice">
           {existing.symbol} is already in this portfolio. Adding it here will
@@ -90,13 +114,13 @@ export default function AddHoldingForm({
         />
         <Field
           label="Average purchase cost per unit (INR)"
-          hint="Optional. Blank means unknown, not zero."
+          hint={useQuote ? 'Latest quote, fixed when you add this holding.' : 'Optional. Blank means unknown, not zero.'}
         >
           <Input
             inputMode="decimal"
             maxLength={64}
-            disabled={busy}
-            value={cost}
+            disabled={busy || useQuote}
+            value={useQuote ? (quoteReady ? current!.current_price.toFixed(2) : '') : cost}
             onChange={(e) => setCost(e.target.value)}
             placeholder="Unknown"
           />
@@ -108,7 +132,7 @@ export default function AddHoldingForm({
         </p>
       )}
       <div className="form-actions sticky-save">
-        <Button type="submit" disabled={busy || !!existing}>
+        <Button type="submit" disabled={busy || !!existing || !asset || (useQuote && !quoteReady)}>
           {busy ? "Saving…" : submitLabel}
         </Button>
         <small className="muted">Ctrl / ⌘ + Enter to save</small>

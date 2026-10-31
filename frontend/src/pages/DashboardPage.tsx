@@ -22,6 +22,7 @@ import HoldingsToolbar, {
 } from "../components/HoldingsToolbar";
 import CreatePortfolio from "../components/CreatePortfolio";
 import ChangeHistory from "../components/ChangeHistory";
+import { usePortfolioPrices, PortfolioPriceSummary, HoldingPrices } from '../components/PortfolioPrices';
 const MarketOverview = lazy(() => import("../components/MarketOverview"));
 export default function DashboardPage({ market }: { market: AssetClass }) {
   const navigate = useNavigate(),
@@ -237,6 +238,7 @@ function Overview({
 }) {
   const ledger = useLedger(initial, onChange),
     p = ledger.portfolio;
+  const prices = usePortfolioPrices(p);
   const [adding, setAdding] = useState(false);
   const navigate = useNavigate();
   const filter = useHoldingFilters(p.holdings);
@@ -284,6 +286,7 @@ function Overview({
         </Modal>
       )}
       <Feedback ledger={ledger} />
+      {p.holdings.length > 0 && <PortfolioPriceSummary prices={prices} />}
       {p.kind === "sample" && (
         <div className="sample-banner">
           <strong>Sample portfolio — for exploration only.</strong>
@@ -368,6 +371,7 @@ function Overview({
                         </strong>
                       </div>
                     </Link>
+                    <HoldingPrices row={prices.data?.holdings.find(row => row.symbol === h.symbol)} stale={!!prices.error} />
                   </li>
                 ))}
               </ul>
@@ -386,8 +390,7 @@ function Overview({
               </div>
             )}
             <p className="valuation-note">
-              Purchase costs are the amounts you enter. Market quotes above do
-              not change your holdings or calculate portfolio returns.
+              Market values refresh automatically. Your saved quantities and purchase costs stay unchanged.
             </p>
           </Card>
           <Card>

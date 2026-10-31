@@ -5,7 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Asset
+from .models import Asset, Portfolio
+from django.shortcuts import get_object_or_404
+from .services.valuation import portfolio_valuation
 from .services import market_data
 
 
@@ -38,3 +40,16 @@ class MarketView(APIView):
 
 class MarketHistoryView(MarketView):
     kind = "history"
+
+
+class PortfolioValuationView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "market"
+
+    def get(self, request, pk):
+        portfolio = get_object_or_404(Portfolio, pk=pk, owner=request.user)
+        payload = portfolio_valuation(portfolio)
+        # A concurrent ledger edit must not be presented as a coherent snapshot.
+        if not Portfolio.objects.filter(pk=pk, owner=request.user, version=portfolio.version).exists():
+            return Response({'detail': 'Portfolio changed. Refresh your portfolio.'}, status=409)
+        return Response(payload, headers={'Cache-Control': 'private, no-store'})

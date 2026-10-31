@@ -1,4 +1,7 @@
-.market-overview { min-width: 0; overflow: hidden; }
+.market-overview { min-width: 0; overflow: hidden; margin-bottom: 32px; }
+@media (max-width: 600px) {
+  .market-overview { margin-bottom: 24px; }
+}
 .market-toolbar, .market-quote, .market-chart-controls { display: flex; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap; align-items: center; }
 .market-toolbar h2 { margin: 0; font-size: 1.25rem; }
 .market-asset-controls { display: flex; gap: .75rem; flex-wrap: wrap; }
